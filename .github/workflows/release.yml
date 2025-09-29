@@ -37,11 +37,19 @@ jobs:
       - name: 📦 Criar MSI
         shell: pwsh
         run: |
-          # Se houver tag, remove o prefixo 'refs/tags/v', senão usa versão de teste
-          $version = if ($env:GITHUB_REF_NAME) { $env:GITHUB_REF_NAME -replace '^refs/tags/v','' } else { $env:TEST_VERSION }
-          Write-Host "Versão detectada: $version"
+          # Usa a tag se existir, senão usa versão de teste
+          if ($env:GITHUB_REF_NAME) {
+              $version = $env:GITHUB_REF_NAME -replace '^refs/tags/v',''
+          } else {
+              $version = $env:TEST_VERSION
+          }
 
-          # Compila MSI
+          # Garantir que a versão tenha 4 partes (x.x.x.x)
+          if ($version.Split('.').Length -eq 3) { $version += ".0" }
+
+          Write-Host "Versão usada: $version"
+
+          # Compila MSI usando WiX
           candle.exe "Installer/Product.wxs" -dProductVersion="$version" -out "Installer/Product.wixobj"
           light.exe "Installer/Product.wixobj" -out "InovaRecorder.msi"
 

@@ -3,7 +3,7 @@ name: 🚀 Criar Release MSI
 on:
   push:
     tags:
-      - "v*.*.*" # dispara apenas quando você criar uma tag (ex: v1.0.0)
+      - 'v*.*.*'
 
 jobs:
   build:
@@ -16,7 +16,7 @@ jobs:
       - name: 🛠️ Instalar .NET
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: "6.0.x"
+          dotnet-version: '6.0.x'
 
       - name: 🔨 Restaurar dependências
         run: dotnet restore
@@ -33,11 +33,10 @@ jobs:
       - name: 📦 Criar MSI
         shell: pwsh
         run: |
-          # Remove o "v" da tag no PowerShell
-          $version = '${GITHUB_REF_NAME}' -replace '^v',''
+          # Remove o prefixo 'refs/tags/v' da tag
+          $version = $env:GITHUB_REF_NAME -replace '^refs/tags/v',''
           Write-Host "Versão detectada: $version"
 
-          # Compilar e linkar o MSI
           candle.exe Installer/Product.wxs -dProductVersion=$version -out Installer/Product.wixobj
           light.exe Installer/Product.wixobj -out InovaRecorder.msi
 

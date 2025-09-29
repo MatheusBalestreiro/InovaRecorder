@@ -1,0 +1,52 @@
+name: ?? Criar Release MSI
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'   # dispara apenas quando você criar uma tag (ex: v1.0.0)
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: ?? Checkout do repositório
+        uses: actions/checkout@v3
+
+      - name: ??? Instalar .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '6.0.x'
+
+      - name: ?? Restaurar dependências
+        run: dotnet restore
+
+      - name: ??? Compilar projeto
+        run: dotnet build --configuration Release
+
+      - name: ?? Publicar build
+        run: dotnet publish -c Release -o out
+
+      - name: ??? Instalar WiX Toolset
+        run: choco install wixtoolset --yes
+
+      - name: ?? Criar MSI
+        run: |
+          candle.exe Installer/Product.wxs -out Installer/Product.wixobj
+          light.exe Installer/Product.wixobj -out InovaRecorder.msi
+
+      - name: ?? Extrair changelog para release notes
+        id: changelog
+        run: |
+          echo "NOTES<<EOF" >> $GITHUB_ENV
+          echo "$(cat CHANGELOG.md)" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+      - name: ?? Criar Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: Release ${{ github.ref_name }}
+          body: ${{ env.NOTES }}
+          files: |
+            InovaRecorder.msi

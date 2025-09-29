@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+
+  <Product Id="*"
+           Name="InovaRecorder"
+           Language="1046"
+           Version="$(var.ProductVersion)"
+           Manufacturer="Matheus Balestreiro"
+           UpgradeCode="{41DB1DC3-42DF-43AC-9787-CFB17090E071}">
+
+    <Package InstallerVersion="500" Compressed="yes" InstallScope="perMachine" />
+    <MediaTemplate />
+
+    <Feature Id="ProductFeature" Title="Inova Recorder" Level="1">
+      <ComponentGroupRef Id="ProductComponents" />
+    </Feature>
+
+    <!-- UI para permitir escolher diretório -->
+    <UIRef Id="WixUI_InstallDir" />
+    <Property Id="WIXUI_INSTALLDIR" Value="INSTALLFOLDER" />
+  </Product>
+
+  <!-- Estrutura de diretórios -->
+  <Fragment>
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <!-- Padrão: C:\InovaRecorder -->
+      <Directory Id="INSTALLFOLDER" Name="InovaRecorder" />
+
+      <!-- Menu iniciar -->
+      <Directory Id="ProgramMenuFolder">
+        <Directory Id="ApplicationProgramsFolder" Name="Inova Recorder" />
+      </Directory>
+
+      <!-- Área de trabalho -->
+      <Directory Id="DesktopFolder" />
+    </Directory>
+  </Fragment>
+
+  <!-- Componentes: executável + atalhos -->
+  <Fragment>
+    <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+
+      <Component Id="MainExecutable" Guid="PUT-OUTRO-GUID-AQUI">
+        <File Id="InovaExe"
+              Source="publicado\\InovaRecorder.exe"
+              KeyPath="yes" />
+
+        <!-- Atalho no Menu Iniciar -->
+        <Shortcut Id="StartMenuShortcut"
+                  Directory="ApplicationProgramsFolder"
+                  Name="Inova Recorder"
+                  WorkingDirectory="INSTALLFOLDER"
+                  Icon="AppIcon"
+                  IconIndex="0"
+                  Advertise="no"
+                  Target="[INSTALLFOLDER]InovaRecorder.exe" />
+
+        <!-- Atalho na Área de Trabalho -->
+        <Shortcut Id="DesktopShortcut"
+                  Directory="DesktopFolder"
+                  Name="Inova Recorder"
+                  WorkingDirectory="INSTALLFOLDER"
+                  Icon="AppIcon"
+                  IconIndex="0"
+                  Advertise="no"
+                  Target="[INSTALLFOLDER]InovaRecorder.exe" />
+
+        <!-- Garantir limpeza na desinstalação -->
+        <RemoveFolder Id="ApplicationProgramsFolder" On="uninstall"/>
+        <RegistryValue Root="HKCU" Key="Software\InovaRecorder" Name="installed" Type="integer" Value="1" KeyPath="yes"/>
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+
+  <!-- Ícone usado nos atalhos -->
+  <Fragment>
+    <Icon Id="AppIcon" SourceFile="Installer\\logo-InovaRecorder.ico"/>
+  </Fragment>
+
+</Wix>

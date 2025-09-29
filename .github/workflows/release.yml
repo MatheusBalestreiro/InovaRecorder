@@ -10,7 +10,7 @@ permissions:
   contents: write   # 🔑 necessário para criar releases e enviar artefatos
 
 env:
-  TEST_VERSION: "0.1.0"   # versão usada para testes manuais (sem tag)
+  TEST_VERSION: "0.1.0.0"   # versão usada para testes manuais (sem tag)
 
 jobs:
   build:
@@ -46,10 +46,18 @@ jobs:
           } else {
             $version = $env:TEST_VERSION
           }
+
+          # Garante formato 0.0.0.0
+          if ($version -notmatch '^\d+\.\d+\.\d+\.\d+$') {
+            $parts = $version.Split('.')
+            while ($parts.Count -lt 4) { $parts += '0' }
+            $version = ($parts[0..3] -join '.')
+          }
+
           Write-Host "Versão usada: $version"
 
           candle.exe "Installer/Product.wxs" -dProductVersion="$version" -out "Installer/Product.wixobj"
-          light.exe "Installer/Product.wixobj" -out "InovaRecorder.msi"
+          light.exe -ext WixUIExtension "Installer/Product.wixobj" -out "InovaRecorder.msi"
 
       - name: 📄 Extrair changelog para release notes
         shell: pwsh

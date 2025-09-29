@@ -1,9 +1,7 @@
-﻿## 🚀 Versão v0.1.0
-
-### ✨ Novidades
+﻿### ✨ Novidades
 - Nota de versão e release automática
 
-### 🐞 Correções
-
+### 🐞 Corre
 
 ### 🎨 Melhorias
+

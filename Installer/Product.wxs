@@ -1,23 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
 
+	<!-- Produto -->
 	<Product Id="*"
 			 Name="InovaRecorder"
-			 Language="1046"
-			 Version="$(var.ProductVersion)"
-			 Manufacturer="Matheus Balestreiro"
-			 UpgradeCode="{41DB1DC3-42DF-43AC-9787-CFB17090E071}">
+			 Language="1046">
+		Version="$(var.ProductVersion)"
+		Manufacturer="Matheus Balestreiro"
+		UpgradeCode="{41DB1DC3-42DF-43AC-9787-CFB17090E071}">
 
+		<!-- Pacote -->
 		<Package InstallerVersion="500" Compressed="yes" InstallScope="perMachine" />
+
 		<MediaTemplate />
 
+		<!-- Feature principal -->
 		<Feature Id="ProductFeature" Title="Inova Recorder" Level="1">
 			<ComponentGroupRef Id="ProductComponents" />
 		</Feature>
 
-		<!-- Interface básica de instalação -->
+		<!-- UI em português para escolher diretório -->
 		<UIRef Id="WixUI_InstallDir" />
+		<WixVariable Id="WixUILocale" Value="pt-BR" />
 		<Property Id="WIXUI_INSTALLDIR" Value="INSTALLFOLDER" />
+
 	</Product>
 
 	<!-- Estrutura de diretórios -->
@@ -31,10 +37,10 @@
 	<!-- Componentes: executável + atalho Desktop -->
 	<Fragment>
 		<ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
-
 			<Component Id="MainExecutable" Guid="{41DB1DC3-42DF-43AC-9787-CFB17090E071}">
-				<File Id="InovaExe"
-					  Source="out\InovaRecorder.exe" />
+
+				<!-- Arquivo principal -->
+				<File Id="InovaExe" Source="out\InovaRecorder.exe" KeyPath="yes" />
 
 				<!-- Atalho na Área de Trabalho -->
 				<Shortcut Id="DesktopShortcut"
@@ -43,26 +49,27 @@
 						  Target="[INSTALLFOLDER]InovaRecorder.exe"
 						  WorkingDirectory="INSTALLFOLDER"
 						  Icon="AppIcon"
-						  IconIndex="0" />
+						  IconIndex="0"
+						  Advertise="no" />
 
-				<!-- Usa registro como KeyPath -->
+				<!-- Remove atalho na desinstalação -->
+				<RemoveFile Id="RemoveDesktopShortcut" Name="Inova Recorder.lnk" On="uninstall" />
+
+				<!-- Registro como KeyPath para evitar ICE43 -->
 				<RegistryValue Root="HKCU"
 							   Key="Software\InovaRecorder"
 							   Name="installed"
 							   Type="integer"
 							   Value="1"
-							   KeyPath="yes"/>
+							   KeyPath="yes" />
 
-				<!-- Remove o atalho no uninstall -->
-				<RemoveFolder Id="DesktopFolder" On="uninstall"/>
 			</Component>
-
 		</ComponentGroup>
 	</Fragment>
 
-	<!-- Ícone usado nos atalhos -->
+	<!-- Ícone usado no atalho -->
 	<Fragment>
-		<Icon Id="AppIcon" SourceFile="Installer\logo-InovaRecorder.ico"/>
+		<Icon Id="AppIcon" SourceFile="Installer\logo-InovaRecorder.ico" />
 	</Fragment>
 
 </Wix>

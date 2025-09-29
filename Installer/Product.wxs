@@ -35,7 +35,7 @@
 	<Fragment>
 		<ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
 
-			<Component Id="MainExecutable" Guid="{SEU-GUID-AQUI}">
+			<Component Id="MainExecutable" Guid="{41DB1DC3-42DF-43AC-9787-CFB17090E071}">
 				<File Id="InovaExe"
 					  Source="out\InovaRecorder.exe"
 					  KeyPath="yes" />

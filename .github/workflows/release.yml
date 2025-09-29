@@ -33,10 +33,11 @@ jobs:
       - name: 📦 Criar MSI
         shell: pwsh
         run: |
-          # Remove 'refs/tags/v' da tag
+          # Remove prefixo 'refs/tags/v'
           $version = $env:GITHUB_REF_NAME -replace '^refs/tags/v',''
           Write-Host "Versão detectada: $version"
 
+          # Compila MSI
           candle.exe Installer/Product.wxs -dProductVersion=$version -out Installer/Product.wixobj
           light.exe Installer/Product.wixobj -out InovaRecorder.msi
 

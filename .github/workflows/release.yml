@@ -3,7 +3,11 @@ name: 🚀 Criar Release MSI
 on:
   push:
     tags:
-      - 'v*.*.*'
+      - 'v*.*.*'   # dispara quando criar tag do tipo v1.0.0
+  workflow_dispatch:   # permite rodar manualmente no Actions
+
+env:
+  TEST_VERSION: "0.1.0"   # versão usada para testes manuais (sem tag)
 
 jobs:
   build:
@@ -33,13 +37,13 @@ jobs:
       - name: 📦 Criar MSI
         shell: pwsh
         run: |
-          # Remove prefixo 'refs/tags/v'
-          $version = $env:GITHUB_REF_NAME -replace '^refs/tags/v',''
+          # Se houver tag, remove o prefixo 'refs/tags/v', senão usa versão de teste
+          $version = if ($env:GITHUB_REF_NAME) { $env:GITHUB_REF_NAME -replace '^refs/tags/v','' } else { $env:TEST_VERSION }
           Write-Host "Versão detectada: $version"
 
           # Compila MSI
-          candle.exe Installer/Product.wxs -dProductVersion="$version" -out Installer/Product.wixobj
-          light.exe Installer/Product.wixobj -out InovaRecorder.msi
+          candle.exe "Installer/Product.wxs" -dProductVersion="$version" -out "Installer/Product.wixobj"
+          light.exe "Installer/Product.wixobj" -out "InovaRecorder.msi"
 
       - name: 📄 Extrair changelog para release notes
         shell: pwsh
@@ -50,6 +54,7 @@ jobs:
           echo "EOF" >> $env:GITHUB_ENV
 
       - name: 🚀 Criar Release
+        if: startsWith(github.ref, 'refs/tags/v')  # só cria release se for tag
         uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ github.ref_name }}

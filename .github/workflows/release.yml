@@ -33,7 +33,7 @@ jobs:
       - name: 📦 Criar MSI
         shell: pwsh
         run: |
-          # Remove o prefixo 'refs/tags/v' da tag
+          # Remove 'refs/tags/v' da tag
           $version = $env:GITHUB_REF_NAME -replace '^refs/tags/v',''
           Write-Host "Versão detectada: $version"
 

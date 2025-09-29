@@ -1,12 +1,13 @@
 name: 🚀 Criar Release MSI
 
-#.
-
 on:
   push:
     tags:
-      - 'v*.*.*'   # dispara quando criar tag do tipo v1.0.0
-  workflow_dispatch:   # permite rodar manualmente no Actions
+      - 'v*.*.*'   # dispara quando criar tag v1.0.0
+  workflow_dispatch:   # permite rodar manualmente
+
+permissions:
+  contents: write   # 🔑 necessário para criar releases e enviar artefatos
 
 env:
   TEST_VERSION: "0.1.0"   # versão usada para testes manuais (sem tag)
@@ -39,23 +40,12 @@ jobs:
       - name: 📦 Criar MSI
         shell: pwsh
         run: |
-          # Remove 'refs/tags/' e o 'v' da tag se existir, senão usa versão de teste
-          if ($env:GITHUB_REF_NAME) {
-              $tag = $env:GITHUB_REF_NAME.Split('/')[-1]   # pega só o nome da tag
-              $version = $tag -replace '^v',''             # remove o "v"
-          } else {
-              $version = $env:TEST_VERSION
-          }
-
-          # Garantir que tenha 4 partes (x.x.x.x)
-          if ($version.Split('.').Length -eq 3) { $version += ".0" }
-
+          # Se houver tag, remove prefixos 'refs/tags/' e 'v', senão usa versão de teste
+          $version = if ($env:GITHUB_REF_NAME) { $env:GITHUB_REF_NAME -replace '^refs/tags/v','' } else { $env:TEST_VERSION }
           Write-Host "Versão usada: $version"
 
-          # Compila MSI usando WiX
-          candle.exe "Installer/Product.wxs" -dProductVersion="$version" -ext WixUIExtension -out "Installer/Product.wixobj"
-          light.exe "Installer/Product.wixobj" -ext WixUIExtension -out "InovaRecorder.msi"
-
+          candle.exe "Installer/Product.wxs" -dProductVersion="$version" -out "Installer/Product.wixobj"
+          light.exe "Installer/Product.wixobj" -out "InovaRecorder.msi"
 
       - name: 📄 Extrair changelog para release notes
         shell: pwsh

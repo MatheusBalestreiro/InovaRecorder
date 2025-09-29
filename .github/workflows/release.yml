@@ -38,7 +38,7 @@ jobs:
           Write-Host "Versão detectada: $version"
 
           # Compila MSI
-          candle.exe Installer/Product.wxs -dProductVersion=$version -out Installer/Product.wixobj
+          candle.exe Installer/Product.wxs -dProductVersion="$version" -out Installer/Product.wixobj
           light.exe Installer/Product.wixobj -out InovaRecorder.msi
 
       - name: 📄 Extrair changelog para release notes

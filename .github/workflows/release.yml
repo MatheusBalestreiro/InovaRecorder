@@ -31,21 +31,23 @@ jobs:
         run: choco install wixtoolset --yes
 
       - name: 📦 Criar MSI
+        shell: pwsh
         run: |
-          # Remove o "v" da tag (WiX precisa só de números)
-          VERSION=${GITHUB_REF_NAME#v}
-          echo "Versão detectada: $VERSION"
+          # Remove o "v" da tag no PowerShell
+          $version = '${GITHUB_REF_NAME}' -replace '^v',''
+          Write-Host "Versão detectada: $version"
 
           # Compilar e linkar o MSI
-          candle.exe Installer/Product.wxs -dProductVersion=$VERSION -out Installer/Product.wixobj
+          candle.exe Installer/Product.wxs -dProductVersion=$version -out Installer/Product.wixobj
           light.exe Installer/Product.wixobj -out InovaRecorder.msi
 
       - name: 📄 Extrair changelog para release notes
-        id: changelog
+        shell: pwsh
         run: |
-          echo "NOTES<<EOF" >> $GITHUB_ENV
-          echo "$(cat CHANGELOG.md)" >> $GITHUB_ENV
-          echo "EOF" >> $GITHUB_ENV
+          $changelog = Get-Content CHANGELOG.md -Raw
+          echo "NOTES<<EOF" >> $env:GITHUB_ENV
+          echo $changelog >> $env:GITHUB_ENV
+          echo "EOF" >> $env:GITHUB_ENV
 
       - name: 🚀 Criar Release
         uses: softprops/action-gh-release@v1

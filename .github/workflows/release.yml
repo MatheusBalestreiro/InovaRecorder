@@ -1,5 +1,7 @@
 name: 🚀 Criar Release MSI
 
+#.
+
 on:
   push:
     tags:
@@ -37,14 +39,15 @@ jobs:
       - name: 📦 Criar MSI
         shell: pwsh
         run: |
-          # Usa a tag se existir, senão usa versão de teste
+          # Remove 'refs/tags/' e o 'v' da tag se existir, senão usa versão de teste
           if ($env:GITHUB_REF_NAME) {
-              $version = $env:GITHUB_REF_NAME -replace '^refs/tags/v',''
+              $tag = $env:GITHUB_REF_NAME.Split('/')[-1]   # pega só o nome da tag
+              $version = $tag -replace '^v',''             # remove o "v"
           } else {
               $version = $env:TEST_VERSION
           }
 
-          # Garantir que a versão tenha 4 partes (x.x.x.x)
+          # Garantir que tenha 4 partes (x.x.x.x)
           if ($version.Split('.').Length -eq 3) { $version += ".0" }
 
           Write-Host "Versão usada: $version"

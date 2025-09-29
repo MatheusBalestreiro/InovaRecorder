@@ -11,7 +11,7 @@
 
 		<!-- Pacote -->
 		<Package InstallerVersion="500" Compressed="yes" InstallScope="perMachine" />
-		<MediaTemplate />
+		<Media Id="1" Cabinet="product.cab" EmbedCab="yes" />
 
 		<!-- Feature principal -->
 		<Feature Id="ProductFeature" Title="Inova Recorder" Level="1">

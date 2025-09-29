@@ -3,7 +3,7 @@ name: 🚀 Criar Release MSI
 on:
   push:
     tags:
-      - 'v*.*.*'   # dispara apenas quando você criar uma tag (ex: v1.0.0)
+      - "v*.*.*" # dispara apenas quando você criar uma tag (ex: v1.0.0)
 
 jobs:
   build:
@@ -16,7 +16,7 @@ jobs:
       - name: 🛠️ Instalar .NET
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: '6.0.x'
+          dotnet-version: "6.0.x"
 
       - name: 🔨 Restaurar dependências
         run: dotnet restore
@@ -32,7 +32,12 @@ jobs:
 
       - name: 📦 Criar MSI
         run: |
-          candle.exe Installer/Product.wxs -out Installer/Product.wixobj
+          # Remove o "v" da tag (WiX precisa só de números)
+          VERSION=${GITHUB_REF_NAME#v}
+          echo "Versão detectada: $VERSION"
+
+          # Compilar e linkar o MSI
+          candle.exe Installer/Product.wxs -dProductVersion=$VERSION -out Installer/Product.wixobj
           light.exe Installer/Product.wixobj -out InovaRecorder.msi
 
       - name: 📄 Extrair changelog para release notes

@@ -53,8 +53,9 @@ jobs:
           Write-Host "Versão usada: $version"
 
           # Compila MSI usando WiX
-          candle.exe "Installer/Product.wxs" -dProductVersion="$version" -out "Installer/Product.wixobj"
-          light.exe "Installer/Product.wixobj" -out "InovaRecorder.msi"
+          candle.exe "Installer/Product.wxs" -dProductVersion="$version" -ext WixUIExtension -out "Installer/Product.wixobj"
+          light.exe "Installer/Product.wixobj" -ext WixUIExtension -out "InovaRecorder.msi"
+
 
       - name: 📄 Extrair changelog para release notes
         shell: pwsh
